@@ -1,0 +1,7 @@
+vendor/
+andrew-cv-app
+_*
+*.test
+.DS_Store
+engine
+bin/
