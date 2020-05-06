@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/andrewjapar/andrew-cv-app/domain"
-	"github.com/go-pg/pg/v9"
-	"github.com/go-pg/pg/v9/orm"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 )
 
@@ -20,33 +20,19 @@ func main() {
 	username := os.Getenv("db_user")
 	password := os.Getenv("db_pass")
 	dbName := os.Getenv("db_name")
-	dbHost := os.Getenv("db_host") + ":" + os.Getenv("db_port")
+	dbHost := os.Getenv("db_host")
 
-	db := pg.Connect(&pg.Options{
-		User:     username,
-		Password: password,
-		Database: dbName,
-		Addr:     dbHost,
-	})
+	dbURI := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password)
+	fmt.Println(dbURI)
 
-	defer db.Close()
-
-	err := createSchema(db)
+	conn, err := gorm.Open("postgres", dbURI)
 	if err != nil {
-		panic(err)
+		fmt.Print(err)
 	}
+
+	defer conn.Close()
+
+	conn.AutoMigrate(&domain.Profile{}, &domain.Podcast{})
 
 	fmt.Println("Hello")
-}
-
-func createSchema(db *pg.DB) error {
-	for _, model := range []interface{}{(*domain.Podcast)(nil), (*domain.Profile)(nil)} {
-		err := db.CreateTable(model, &orm.CreateTableOptions{
-			IfNotExists: true,
-		})
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
