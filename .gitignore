@@ -1,7 +1,6 @@
-vendor/
-andrew-cv-app
 _*
 *.test
+.env
 .DS_Store
-engine
-bin/
+vendor/
+cmd/cmd
