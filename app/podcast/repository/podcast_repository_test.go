@@ -18,7 +18,7 @@ func TestGet(t *testing.T) {
 	gormDb, _ := gorm.Open("postgres", db)
 
 	if err != nil {
-		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		t.Fatalf("stub db connection error: '%s'", err)
 	}
 
 	mockPodcasts := []domain.Podcast{

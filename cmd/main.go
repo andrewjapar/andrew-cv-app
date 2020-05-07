@@ -2,19 +2,23 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
+	_podcastHttpHandler "github.com/andrewjapar/andrew-cv-app/app/podcast/handler"
+	_podcastRepo "github.com/andrewjapar/andrew-cv-app/app/podcast/repository"
 	"github.com/andrewjapar/andrew-cv-app/domain"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo"
 )
 
 func main() {
 
-	e := godotenv.Load()
-	if e != nil {
-		fmt.Print(e)
+	envErr := godotenv.Load()
+	if envErr != nil {
+		fmt.Print(envErr)
 	}
 
 	username := os.Getenv("db_user")
@@ -34,5 +38,10 @@ func main() {
 
 	conn.AutoMigrate(&domain.Profile{}, &domain.Podcast{})
 
-	fmt.Println("Hello")
+	e := echo.New()
+
+	podcastRepo := _podcastRepo.NewPodcastRepository(conn)
+	_podcastHttpHandler.NewPodcastHandler(e, podcastRepo)
+
+	log.Fatal(e.Start(os.Getenv("server_address")))
 }
