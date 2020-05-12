@@ -7,6 +7,8 @@ import (
 
 	_podcastHttpHandler "github.com/andrewjapar/andrew-cv-app/app/podcast/handler"
 	_podcastRepo "github.com/andrewjapar/andrew-cv-app/app/podcast/repository"
+	_weddingHttpHandler "github.com/andrewjapar/andrew-cv-app/app/wedding/handler"
+	_weddingRepo "github.com/andrewjapar/andrew-cv-app/app/wedding/repository"
 	"github.com/andrewjapar/andrew-cv-app/domain"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -36,12 +38,15 @@ func main() {
 
 	defer conn.Close()
 
-	conn.AutoMigrate(&domain.Profile{}, &domain.Podcast{})
+	conn.AutoMigrate(&domain.Profile{}, &domain.Podcast{}, &domain.Wedding{}, &domain.User{}, &domain.WeddingOrganizer{})
 
 	e := echo.New()
 
 	podcastRepo := _podcastRepo.NewPodcastRepository(conn)
 	_podcastHttpHandler.NewPodcastHandler(e, podcastRepo)
+
+	weddingRepo := _weddingRepo.NewWeddingRepository(conn)
+	_weddingHttpHandler.NewWeddingHandler(e, weddingRepo)
 
 	log.Fatal(e.Start(os.Getenv("server_address")))
 }
